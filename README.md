@@ -1,3 +1,14 @@
+# WinterJS
+***
+## What is WinterJS
+WinterJS is a light weight [IoC](http://en.wikipedia.org/wiki/Inversion_of_control) framework written in JavaScript.
+
+## Need for WinterJS
+The objective of WinterJS is to enable authoring of testable JavaScript apps/frameworks. This is achieved by providing a [DI](http://en.wikipedia.org/wiki/Dependency_injection) mechanism.
+
+
+***
+
 ```javascript
  
 prototypeDependencyDef = {
@@ -31,7 +42,7 @@ singletonDependencyDef = {
     ,def: {
         scope: ABC
         ,namedRef: "f"
-        ,singleton: true (default false; singletons should be discouraged)
+        ,singleton: true //(default false; singletons should be discouraged)
     }
     ,constructorArgs: [
         {
