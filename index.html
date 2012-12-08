@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Winterjs by vaeroon</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Winterjs</h1>
+        <h2>Dependency  Injection JS</h2>
+        <a href="https://github.com/vaeroon/WinterJS" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <div class="highlight"><pre>
+<span class="nx">prototypeDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">PROTO</span>
+    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
+        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
+    <span class="p">}</span>
+    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
+        <span class="p">}</span>
+        <span class="p">,{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
+    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
+            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">singletonDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">SINGLETON</span>
+    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
+        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
+        <span class="p">,</span><span class="nx">singleton</span><span class="o">:</span> <span class="kc">true</span> <span class="c1">//(default false; singletons should be discouraged)</span>
+    <span class="p">}</span>
+    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
+        <span class="p">}</span>
+        <span class="p">,{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
+    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
+            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">factoryDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">FACTORY</span>
+    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
+        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
+        <span class="p">,</span><span class="nx">factory</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">obj</span><span class="o">:</span> <span class="nx">FactoryReference</span>
+            <span class="p">,</span><span class="nx">methodName</span><span class="o">:</span> <span class="s2">"factoryMethodName"</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
+        <span class="p">}</span>
+        <span class="p">,{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
+    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
+            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">valueDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">VALUE</span>
+    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="s2">"this can be anything like string/number/object/array/function"</span>
+<span class="p">}</span>
+
+</pre></div>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/vaeroon/WinterJS/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/vaeroon/WinterJS/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/vaeroon/WinterJS"></a> is maintained by <a href="https://github.com/vaeroon">vaeroon</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
