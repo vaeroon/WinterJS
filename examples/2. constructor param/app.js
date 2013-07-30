@@ -1,8 +1,8 @@
 
 !function(a,b,c) {
-    this.message = a+b+c;                    //this is my target object where we demo DI
+    this.message = a+b+c;
     this.greet = function() {
-            alert(this.message);      //notice that this object does NOT have o1.foo()
+            alert(this.message);
     }
 }.Inject({
     name: "someFunc"
@@ -10,11 +10,11 @@
     ,autowire: {
         constructorArgs: [{
             ref: "hello.message"
-            ,name: "c"      //Hey! I would like to get some "foo.provider" stuff injected as o1.
+            ,name: "c"
         }]
     }
 });
-!function(){}.Inject({          //The order in which ctors register does NOT matter :)
+!function(){}.Inject({
     type: Inject.DEPENDENCY_TYPES.VALUE
     ,exports: ["hello.message"]
     ,value: ", World!"
