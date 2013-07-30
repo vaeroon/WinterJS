@@ -6,7 +6,6 @@
     }
 }.Inject({
     name: "someFunc"
-    ,type: Inject.DEPENDENCY_TYPES.PROTO
     ,autowire: {
         constructorArgs: ["hello.message"]
     }

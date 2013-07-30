@@ -113,7 +113,7 @@ describe("suite of Inject specs:- ", function() {
         Inject.injectPropertyDependencies({}, null);
         expect(Inject.injectPropertyDependency).not.toHaveBeenCalled();
         
-        var obj={}, deps=[{name:'a', ref:"b"}, {name:'c', ref:"d"}];
+        var obj={}, deps=[{a:"b"}, {c:"d"}];
         Inject.injectPropertyDependencies(obj, deps);
         expect(Inject.injectPropertyDependency.callCount).toBe(2);
         
