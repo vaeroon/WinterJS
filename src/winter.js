@@ -60,11 +60,18 @@ Inject.createObjectFromRealConstructor = function(ctor, spec) {
 Inject.createProxyMethodForInjectingDependencies = function(targetObj, methodName, dependencies) {
     var targetMethod = targetObj[methodName];
     targetObj[methodName] = function() {
-        for(var i=0, dependencyInstances=[], len=dependencies.length; i<len; i++) {
-            dependencyInstances.push(Inject.getDependencyInstance(dependencies[i]));
+        var arr = Array.prototype.slice.call(arguments, 0), numMissingArgs = targetMethod.length - arr.length;
+        if(dependencies && dependencies.length>0 && numMissingArgs>0) {
+            var args = dependencies.slice(0-numMissingArgs);
+            while(numMissingArgs > 0) {
+                arr.push(Inject.getDependencyInstance(Inject.lookupDependencyProvider(args[args.length-numMissingArgs])));
+                --numMissingArgs;
+            }
         }
-        var arr = Array.prototype.slice.call(arguments, 0);
-        targetMethod.apply(this,arr.concat(dependencyInstances));
+        //for(var i=0, dependencyInstances=[], len=dependencies.length; i<len; i++) {
+        
+        //var arr = Array.prototype.slice.call(arguments, 0);
+        return targetMethod.apply(this,arr);
     };
 }
 
@@ -77,6 +84,9 @@ Inject.injectMethodDependencies = function(targetObj, dependencySpec) {
         Inject.createProxyMethodForInjectingDependencies(targetObj, methodName, dependencies)
     }
 }
+
+
+//Inject.getDependencyInstance
 
 Inject.injectPropertyDependencies = function(targetObj, dependencies) {
     if(typeof targetObj !='object' || targetObj===null || typeof dependencies !='object' || dependencies===null) return;

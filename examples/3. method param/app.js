@@ -1,17 +1,15 @@
 
 !function(a,b,c) {
-    this.message = a+b+c;
-    this.greet = function() {
-            alert(this.message);
+    this.greet = function(a,b,c) {
+            alert(a+b+c);
     }
 }.Inject({
     name: "someFunc"
     ,type: Inject.DEPENDENCY_TYPES.PROTO
     ,autowire: {
-        constructorArgs: [{
-            ref: "hello.message"
-            ,name: "c"
-        }]
+        methods: {
+            greet: ["hello.message"]
+        }
     }
 });
 !function(){}.Inject({
