@@ -143,7 +143,7 @@ Inject.getConstructorArgDependencies = function(ctorArgs) {
     var args=[];
     if(typeof ctorArgs=='object' && ctorArgs.length>0) {
         for(var i=0, len=ctorArgs.length; i<len; i++) {
-            args.push(Inject.getDependencyInstance(Inject.lookupDependencyProvider(ctorArgs[i].ref)));
+            args.push(Inject.getDependencyInstance(Inject.lookupDependencyProvider(ctorArgs[i])));
         }
     }
     return args;
@@ -173,7 +173,7 @@ Inject.defineNamespacedFunction = function(dotSeparatedNamespaceString, func) {
     var parent = window;
     for(var i=0, len=arr.length; i<len; i++) {
         if(!parent[arr[i]]) parent[arr[i]] = {};
-        parent = arr[i];
+        parent = parent[arr[i]];
     }
     parent[ref] = func;
 }

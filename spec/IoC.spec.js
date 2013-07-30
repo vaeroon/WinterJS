@@ -57,14 +57,11 @@ describe("suite of Inject specs:- ", function() {
     });
     
     it("creates a proxy constructor function, and, the dependencies are injected when it is invoked", function() {
-        var cntxt = {};
         var f = function(x,y){
             this.x=x;
             this.y=y;
         };
-        spyOn(Inject, "injectPropertyDependencies");
-        spyOn(Inject, "injectMethodDependencies");
-        var obj = {
+        var dependencyDef = {
             name : 'MyObj.f'
             ,autowire: {
                 properties : {
@@ -73,15 +70,32 @@ describe("suite of Inject specs:- ", function() {
                 ,methods: {
                     "c": "d"
                 }
+                ,constructorArgs: ["e","f"]
             }
         };
-        var proxyfunc = Inject.createProxyConstructor(f, obj);
-        expect(typeof proxyfunc).toBe("function");
-        cntxt = proxyfunc.call(cntxt, 10, 20);
+        
+        spyOn(Inject, "injectPropertyDependencies");
+        spyOn(Inject, "injectMethodDependencies");
+        spyOn(Inject, "createProxyConstructor").andCallThrough();
+        
+        f.Inject(dependencyDef);
+        !function() {}.Inject({          //The order in which ctors register does NOT matter :)
+            type: Inject.DEPENDENCY_TYPES.VALUE
+            ,exports: ["e"]
+            ,value: 10
+        });
+        !function() {}.Inject({          //The order in which ctors register does NOT matter :)
+            type: Inject.DEPENDENCY_TYPES.VALUE
+            ,exports: ["f"]
+            ,value: 20
+        });
+
+        var cntxt = new MyObj.f();
         expect(cntxt.x).toBe(10);
         expect(cntxt.y).toBe(20);
-        expect(Inject.injectPropertyDependencies).toHaveBeenCalledWith(cntxt, obj.autowire.properties);
-        expect(Inject.injectMethodDependencies).toHaveBeenCalledWith(cntxt, obj.autowire.methods);
+        expect(Inject.createProxyConstructor).toHaveBeenCalledWith(f, dependencyDef);
+        expect(Inject.injectPropertyDependencies).toHaveBeenCalledWith(cntxt, dependencyDef.autowire.properties);
+        expect(Inject.injectMethodDependencies).toHaveBeenCalledWith(cntxt, dependencyDef.autowire.methods);
     });
     
     it("iterates through the specified property dependencies and invokes injectPropertyDependency for each", function() {
@@ -251,8 +265,10 @@ describe("suite of Inject specs:- ", function() {
         
     });
     
-    xit("", function() {
-        
+    it("creates a namespaced function", function() {
+        var f=function(){};
+        Inject.defineNamespacedFunction("A.B.C.foo", f);
+        expect(window.A.B.C.foo).toBe(f);
     });
     
     xit("", function() {
