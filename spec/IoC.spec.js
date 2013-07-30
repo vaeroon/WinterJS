@@ -1,45 +1,59 @@
-describe("suite of DIfunction specs:- ", function() {
+describe("suite of Inject specs:- ", function() {
     
     beforeEach(function () {
-       DIfunction.providers={}; 
+       Inject.providers={}; 
+    });
+    
+    it("expects either name to be present in definition or the definition type to be 'value'", function() {
+        var f = function(){};
+        spyOn(Inject, "registerDependencyProvider");
+        spyOn(Inject, "createProxyConstructor");
+        spyOn(Inject, "defineNamespacedFunction");
+        f.Inject({
+            type : Inject.DEPENDENCY_TYPES.VALUE
+        });
+        expect(Inject.defineNamespacedFunction).not.toHaveBeenCalled();
+        expect(Inject.createProxyConstructor.callCount).toBe(0);
+        expect(Inject.registerDependencyProvider).not.toHaveBeenCalled();
+        
+        f.Inject({
+            name : 'obj.foo'
+        });
+        expect(Inject.defineNamespacedFunction.callCount).toBe(1);
+        expect(Inject.createProxyConstructor.callCount).toBe(1);
+        expect(Inject.registerDependencyProvider).not.toHaveBeenCalled();
     });
     
     it("proxies the constructor but does not register when there are no exports", function() {
         var f = function(){};
-        spyOn(DIfunction, "registerDependencyProvider");
-        spyOn(DIfunction, "createProxyConstructor");
-        f.DIfunction({
-            def : {
-                scope: {}
-                ,namedRef: 'f'
-            }
+        spyOn(Inject, "registerDependencyProvider");
+        spyOn(Inject, "createProxyConstructor");
+        f.Inject({
+            name : 'MyObj.f'
         });
-        expect(DIfunction.createProxyConstructor.callCount).toBe(1);
-        expect(DIfunction.registerDependencyProvider).not.toHaveBeenCalled();
+        expect(Inject.createProxyConstructor.callCount).toBe(1);
+        expect(Inject.registerDependencyProvider).not.toHaveBeenCalled();
     });
     
     it("proxies and registers the constructor when there is atleast one export", function() {
         var f = function(){};
-        spyOn(DIfunction, "registerDependencyProvider");
-        spyOn(DIfunction, "createProxyConstructor");
-        f.DIfunction({
-            def : {
-                scope: {}
-                ,namedRef: 'f'
-            }
+        spyOn(Inject, "registerDependencyProvider");
+        spyOn(Inject, "createProxyConstructor");
+        f.Inject({
+            name : 'MyObj.f'
             ,exports : ["blah"]
         });
-        expect(DIfunction.createProxyConstructor.callCount).toBe(1);
-        expect(DIfunction.registerDependencyProvider.callCount).toBe(1);
+        expect(Inject.createProxyConstructor.callCount).toBe(1);
+        expect(Inject.registerDependencyProvider.callCount).toBe(1);
     });
     
     it("adds entries in the registry for all export entries", function() {
         var obj = {
             exports: ["abc", "def"]
         };
-        DIfunction.registerDependencyProvider(obj);
-        expect(DIfunction.providers.abc).toBe(obj);
-        expect(DIfunction.providers.def).toBe(obj);
+        Inject.registerDependencyProvider(obj);
+        expect(Inject.providers.abc).toBe(obj);
+        expect(Inject.providers.def).toBe(obj);
     });
     
     it("creates a proxy constructor function, and, the dependencies are injected when it is invoked", function() {
@@ -48,51 +62,54 @@ describe("suite of DIfunction specs:- ", function() {
             this.x=x;
             this.y=y;
         };
-        spyOn(DIfunction, "injectPropertyDependencies");
-        spyOn(DIfunction, "injectMethodDependencies");
+        spyOn(Inject, "injectPropertyDependencies");
+        spyOn(Inject, "injectMethodDependencies");
         var obj = {
-            propertyDependencies : {
-                "a": "b"
-            }
-            ,methodDependencies: {
-                "c": "d"
+            name : 'MyObj.f'
+            ,autowire: {
+                properties : {
+                    "a": "b"
+                }
+                ,methods: {
+                    "c": "d"
+                }
             }
         };
-        var proxyfunc = DIfunction.createProxyConstructor(f, obj);
+        var proxyfunc = Inject.createProxyConstructor(f, obj);
         expect(typeof proxyfunc).toBe("function");
         cntxt = proxyfunc.call(cntxt, 10, 20);
         expect(cntxt.x).toBe(10);
         expect(cntxt.y).toBe(20);
-        expect(DIfunction.injectPropertyDependencies).toHaveBeenCalledWith(cntxt, obj.propertyDependencies);
-        expect(DIfunction.injectMethodDependencies).toHaveBeenCalledWith(cntxt, obj.methodDependencies);
+        expect(Inject.injectPropertyDependencies).toHaveBeenCalledWith(cntxt, obj.autowire.properties);
+        expect(Inject.injectMethodDependencies).toHaveBeenCalledWith(cntxt, obj.autowire.methods);
     });
     
     it("iterates through the specified property dependencies and invokes injectPropertyDependency for each", function() {
-        spyOn(DIfunction, "injectPropertyDependency");
+        spyOn(Inject, "injectPropertyDependency");
         
-        DIfunction.injectPropertyDependencies("blah", {});
-        expect(DIfunction.injectPropertyDependency).not.toHaveBeenCalled();
+        Inject.injectPropertyDependencies("blah", {});
+        expect(Inject.injectPropertyDependency).not.toHaveBeenCalled();
         
-        DIfunction.injectPropertyDependencies(null, {});
-        expect(DIfunction.injectPropertyDependency).not.toHaveBeenCalled();
+        Inject.injectPropertyDependencies(null, {});
+        expect(Inject.injectPropertyDependency).not.toHaveBeenCalled();
         
-        DIfunction.injectPropertyDependencies({}, "blah");
-        expect(DIfunction.injectPropertyDependency).not.toHaveBeenCalled();
+        Inject.injectPropertyDependencies({}, "blah");
+        expect(Inject.injectPropertyDependency).not.toHaveBeenCalled();
         
-        DIfunction.injectPropertyDependencies({}, null);
-        expect(DIfunction.injectPropertyDependency).not.toHaveBeenCalled();
+        Inject.injectPropertyDependencies({}, null);
+        expect(Inject.injectPropertyDependency).not.toHaveBeenCalled();
         
         var obj={}, deps=[{name:'a', ref:"b"}, {name:'c', ref:"d"}];
-        DIfunction.injectPropertyDependencies(obj, deps);
-        expect(DIfunction.injectPropertyDependency.callCount).toBe(2);
+        Inject.injectPropertyDependencies(obj, deps);
+        expect(Inject.injectPropertyDependency.callCount).toBe(2);
         
-        var args = DIfunction.injectPropertyDependency.argsForCall[0];
+        var args = Inject.injectPropertyDependency.argsForCall[0];
         expect(args.length).toBe(3);
         expect(args[0]).toBe(obj);
         expect(args[1]).toBe("a");
         expect(args[2]).toBe("b");
         
-        args = DIfunction.injectPropertyDependency.argsForCall[1];
+        args = Inject.injectPropertyDependency.argsForCall[1];
         expect(args.length).toBe(3);
         expect(args[0]).toBe(obj);
         expect(args[1]).toBe("c");
@@ -100,21 +117,21 @@ describe("suite of DIfunction specs:- ", function() {
     });
     
     it("injects dependency instance against specified object's property", function() {
-        spyOn(DIfunction, "getDependencyInstance");
+        spyOn(Inject, "getDependencyInstance");
         var obj={}, dep={};
         
-        DIfunction.injectPropertyDependency(obj, "x", "abc");
-        expect(DIfunction.getDependencyInstance).not.toHaveBeenCalled();
+        Inject.injectPropertyDependency(obj, "x", "abc");
+        expect(Inject.getDependencyInstance).not.toHaveBeenCalled();
         
-        DIfunction.providers.abc=dep;
-        DIfunction.injectPropertyDependency(obj, "x", "abc");
-        expect(DIfunction.getDependencyInstance).toHaveBeenCalledWith(dep);
+        Inject.providers.abc=dep;
+        Inject.injectPropertyDependency(obj, "x", "abc");
+        expect(Inject.getDependencyInstance).toHaveBeenCalledWith(dep);
     });
     
     it("looks up the dependency provider map", function() {
-        DIfunction.providers.abc="dep";
-        expect(typeof DIfunction.lookupDependencyProvider("foo")).toBe("undefined");
-        expect(DIfunction.lookupDependencyProvider("abc")).toBe("dep");
+        Inject.providers.abc="dep";
+        expect(typeof Inject.lookupDependencyProvider("foo")).toBe("undefined");
+        expect(Inject.lookupDependencyProvider("abc")).toBe("dep");
     });
     
     it("creates a proxy of the specified method, and, the dependencies are injected as parameters when it is invoked", function() {
@@ -128,8 +145,8 @@ describe("suite of DIfunction specs:- ", function() {
                 getName: function() {return "abc";}
             };
         }
-        spyOn(DIfunction, "getDependencyInstance").andReturn(new namefunc());
-        DIfunction.createProxyMethodForInjectingDependencies(obj, "foo", ["nameprovider"]);
+        spyOn(Inject, "getDependencyInstance").andReturn(new namefunc());
+        Inject.createProxyMethodForInjectingDependencies(obj, "foo", ["nameprovider"]);
         obj.foo("hello");
         expect(obj.name).toBe("abc");
         
@@ -144,47 +161,44 @@ describe("suite of DIfunction specs:- ", function() {
             getOne: function() {}
             ,getTwo: function(){}
         }
-        spyOn(DIfunction, "createProxyMethodForInjectingDependencies");
-        DIfunction.injectMethodDependencies(obj, deps);
-        expect(DIfunction.createProxyMethodForInjectingDependencies.callCount).toBe(2);
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[0].args[0]).toBe(obj);
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[0].args[1]).toBe("getOne");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[0].args[2][0]).toBe("o");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[0].args[2][1]).toBe("n");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[0].args[2][2]).toBe("e");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[1].args[0]).toBe(obj);
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[1].args[1]).toBe("getTwo");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[1].args[2][0]).toBe("t");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[1].args[2][1]).toBe("w");
-        expect(DIfunction.createProxyMethodForInjectingDependencies.calls[1].args[2][2]).toBe("o");
+        spyOn(Inject, "createProxyMethodForInjectingDependencies");
+        Inject.injectMethodDependencies(obj, deps);
+        expect(Inject.createProxyMethodForInjectingDependencies.callCount).toBe(2);
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[0].args[0]).toBe(obj);
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[0].args[1]).toBe("getOne");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[0].args[2][0]).toBe("o");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[0].args[2][1]).toBe("n");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[0].args[2][2]).toBe("e");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[1].args[0]).toBe(obj);
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[1].args[1]).toBe("getTwo");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[1].args[2][0]).toBe("t");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[1].args[2][1]).toBe("w");
+        expect(Inject.createProxyMethodForInjectingDependencies.calls[1].args[2][2]).toBe("o");
     });
     
     it("does not resolve further and directly returns the value specified for a value type dependency", function() {
         var valueDependencyDef = {
-            DEPENDENCY_TYPE: DIfunction.DEPENDENCY_TYPES.VALUE
-            ,def: "this can be anything like string/number/object/array/function"
+            type: Inject.DEPENDENCY_TYPES.VALUE
+            ,value: "this can be anything like string/number/object/array/function"
         };
-        var obj = DIfunction.getDependencyInstance(valueDependencyDef);
-        expect(obj).toBe(valueDependencyDef.def);
+        var obj = Inject.getDependencyInstance(valueDependencyDef);
+        expect(obj).toBe(valueDependencyDef.value);
     });
     
     it("returns null for a specified dependency when scope[namedref] is not a function", function() {
         var dependencyDef = {
-            DEPENDENCY_TYPE: DIfunction.DEPENDENCY_TYPES.PROTO
-            ,def: {
-                scope:window
-                ,namedRef: "somethingUndefined"
-            }
+            type: Inject.DEPENDENCY_TYPES.PROTO
+            ,name: "somethingUndefined"
         };
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(null);
         
-        dependencyDef.DEPENDENCY_TYPE = DIfunction.DEPENDENCY_TYPES.SINGLETON;
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        dependencyDef.type = Inject.DEPENDENCY_TYPES.SINGLETON;
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(null);
         
-        dependencyDef.DEPENDENCY_TYPE = DIfunction.DEPENDENCY_TYPES.FACTORY;
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        dependencyDef.type = Inject.DEPENDENCY_TYPES.FACTORY;
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(null);
     });
     
@@ -193,43 +207,40 @@ describe("suite of DIfunction specs:- ", function() {
         var o1 = {}, o2 = {}, o3 = {};
         //x.foo.andReturn(o1);
         var dependencyDef = {
-            DEPENDENCY_TYPE: DIfunction.DEPENDENCY_TYPES.PROTO
-            ,def: {
-                scope:x
-                ,namedRef: "foo"
-            }
+            type: Inject.DEPENDENCY_TYPES.PROTO
+            ,name: 'x.foo'
         };
-        spyOn(DIfunction, "DIconstruct").andReturn(o1);
-        spyOn(DIfunction, "getSingletonInstance").andReturn(o2);
-        spyOn(DIfunction, "getDependencyInstanceFromFactory").andReturn(o3);
+        spyOn(Inject, "DIconstruct").andReturn(o1);
+        spyOn(Inject, "getSingletonInstance").andReturn(o2);
+        spyOn(Inject, "getDependencyInstanceFromFactory").andReturn(o3);
         
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(o1);
-        expect(DIfunction.DIconstruct.callCount).toBe(1);
-        expect(DIfunction.getSingletonInstance.callCount).toBe(0);
-        expect(DIfunction.getDependencyInstanceFromFactory.callCount).toBe(0);
+        expect(Inject.DIconstruct.callCount).toBe(1);
+        expect(Inject.getSingletonInstance.callCount).toBe(0);
+        expect(Inject.getDependencyInstanceFromFactory.callCount).toBe(0);
         
-        DIfunction.DIconstruct.reset();
-        DIfunction.getSingletonInstance.reset();
-        DIfunction.getDependencyInstanceFromFactory.reset();
+        Inject.DIconstruct.reset();
+        Inject.getSingletonInstance.reset();
+        Inject.getDependencyInstanceFromFactory.reset();
         
-        dependencyDef.DEPENDENCY_TYPE = DIfunction.DEPENDENCY_TYPES.SINGLETON;
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        dependencyDef.type = Inject.DEPENDENCY_TYPES.SINGLETON;
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(o2);
-        expect(DIfunction.DIconstruct.callCount).toBe(0);
-        expect(DIfunction.getSingletonInstance.callCount).toBe(1);
-        expect(DIfunction.getDependencyInstanceFromFactory.callCount).toBe(0);
+        expect(Inject.DIconstruct.callCount).toBe(0);
+        expect(Inject.getSingletonInstance.callCount).toBe(1);
+        expect(Inject.getDependencyInstanceFromFactory.callCount).toBe(0);
         
-        DIfunction.DIconstruct.reset();
-        DIfunction.getSingletonInstance.reset();
-        DIfunction.getDependencyInstanceFromFactory.reset();
+        Inject.DIconstruct.reset();
+        Inject.getSingletonInstance.reset();
+        Inject.getDependencyInstanceFromFactory.reset();
         
-        dependencyDef.DEPENDENCY_TYPE = DIfunction.DEPENDENCY_TYPES.FACTORY;
-        var obj = DIfunction.getDependencyInstance(dependencyDef);
+        dependencyDef.type = Inject.DEPENDENCY_TYPES.FACTORY;
+        var obj = Inject.getDependencyInstance(dependencyDef);
         expect(obj).toBe(o3);
-        expect(DIfunction.DIconstruct.callCount).toBe(0);
-        expect(DIfunction.getSingletonInstance.callCount).toBe(0);
-        expect(DIfunction.getDependencyInstanceFromFactory.callCount).toBe(1);
+        expect(Inject.DIconstruct.callCount).toBe(0);
+        expect(Inject.getSingletonInstance.callCount).toBe(0);
+        expect(Inject.getDependencyInstanceFromFactory.callCount).toBe(1);
     });
     
     xit("returns an instance for a specified dependency", function() {

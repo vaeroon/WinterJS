@@ -1,6 +1,6 @@
 
 Inject = function(spec) {
-    if(typeof spec.name != 'string') {
+    if(typeof spec.name != 'string' && spec.type!=Inject.DEPENDENCY_TYPES.VALUE) {
         throw 'invalid invocation';
     };
     var ctor = this, providers = Inject.providers;
@@ -8,7 +8,7 @@ Inject = function(spec) {
         Inject.registerDependencyProvider(spec);
     }
     //spec.def.scope[spec.def.namedRef] = 
-    Inject.defineNamespacedFunction(spec.name, Inject.createProxyConstructor(ctor, spec));
+    if(typeof spec.name == 'string') Inject.defineNamespacedFunction(spec.name, Inject.createProxyConstructor(ctor, spec));
 }
 
 Inject.providers={};
@@ -28,14 +28,17 @@ Inject.registerDependencyProvider = function(spec) {
 Inject.createProxyConstructor = function(ctor, spec) {
     return function() {
         //var targetObj = Inject.createObjectFromRealConstructor(ctor, spec)
-        var arr = Array.prototype.slice.call(arguments, 0), numMissingArgs = arr.length - ctor.length;
-        var args = Inject.getConstructorArgDependencies(spec.autowire.constructorArgs);
-        while(numMissingArgs > 0) {
-            arr.push(args[args.length-numMissingArgs]);
-            --numMissingArgs;
+        var arr = Array.prototype.slice.call(arguments, 0), numMissingArgs = ctor.length  - arr.length;
+        if(spec.autowire.constructorArgs && spec.autowire.constructorArgs.length>0 && numMissingArgs>0) {
+            var args = Inject.getConstructorArgDependencies(spec.autowire.constructorArgs.slice(0-numMissingArgs));
+            while(numMissingArgs > 0) {
+                arr.push(args[args.length-numMissingArgs]);
+                --numMissingArgs;
+            }
         }
-        var targetObj = {};
-        targetObj = ctor.apply(targetObj, arr);
+        var targetObj = {}, returnedObj;
+        returnedObj = ctor.apply(targetObj, arr);
+        if(returnedObj) targetObj = returnedObj;
         Inject.injectPropertyDependencies(targetObj, spec.autowire.properties);
         Inject.injectMethodDependencies(targetObj, spec.autowire.methods);
         return targetObj;
@@ -120,9 +123,9 @@ Inject.getDependencyInstance = function(dependencyDef) {
 }
 
 Inject.getDependencyInstanceFromFactory = function(dependencyDef) {
-    if(typeof def.factory == 'object' && def.factory != null 
-        && typeof def.factory.obj == 'object' && def.factory.obj != null 
-        && typeof def.factory.methodName == 'string' && def.factory.methodName.length > 0) {
+    if(typeof dependencyDef.factory == 'object' && dependencyDef.factory != null 
+        && typeof dependencyDef.factory.obj == 'object' && dependencyDef.factory.obj != null 
+        && typeof dependencyDef.factory.methodName == 'string' && dependencyDef.factory.methodName.length > 0) {
         //return Inject.DIconstruct(dependencyDef);
         var args=[], ctorArgs = dependencyDef.autowire.constructorArgs;
         var args = Inject.getConstructorArgDependencies(dependencyDef.autowire.constructorArgs);
@@ -131,7 +134,7 @@ Inject.getDependencyInstanceFromFactory = function(dependencyDef) {
                 args.push(Inject.getDependencyInstance(ctorArgs[i].ref));
             }
         }*/
-        return def.factory.obj[def.factory.methodName].apply(def.factory.obj, args);
+        return dependencyDef.factory.obj[dependencyDef.factory.methodName].apply(dependencyDef.factory.obj, args);
     }
     return null;
 }
@@ -140,7 +143,7 @@ Inject.getConstructorArgDependencies = function(ctorArgs) {
     var args=[];
     if(typeof ctorArgs=='object' && ctorArgs.length>0) {
         for(var i=0, len=ctorArgs.length; i<len; i++) {
-            args.push(Inject.getDependencyInstance(ctorArgs[i].ref));
+            args.push(Inject.getDependencyInstance(Inject.lookupDependencyProvider(ctorArgs[i].ref)));
         }
     }
     return args;
@@ -148,6 +151,7 @@ Inject.getConstructorArgDependencies = function(ctorArgs) {
 
 Inject.getSingletonInstance = function(dependencyDef) {
     var provides = dependencyDef.exports;
+    if(!provides || provides.length<1) return null;
     if(typeof Inject.singletons[provides[0]] == 'object') {
         return Inject.singletons[provides[0]];
     }
@@ -159,7 +163,7 @@ Inject.getSingletonInstance = function(dependencyDef) {
 
 Inject.DIconstruct = function(dependencyDef) {
     var arr = Inject.getNamespacedFunction(dependencyDef.name), scope=arr[0], func=arr[1];
-    return scope[func].call({});
+    return (typeof scope[func] == 'function')? scope[func].call({}) : null;
 }
 
 Inject.defineNamespacedFunction = function(dotSeparatedNamespaceString, func) {
