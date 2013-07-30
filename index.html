@@ -28,106 +28,24 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>WinterJS</h1>
+          <h1>
+<a name="winterjs" class="anchor" href="#winterjs"><span class="octicon octicon-link"></span></a>WinterJS</h1>
 
-<hr><h2>What is WinterJS</h2>
+<hr><h2>
+<a name="what-is-winterjs" class="anchor" href="#what-is-winterjs"><span class="octicon octicon-link"></span></a>What is WinterJS</h2>
 
-<p>WinterJS is a light weight <a href="http://en.wikipedia.org/wiki/Inversion_of_control">IoC</a> framework written in JavaScript.</p>
+<p>WinterJS is a light weight (no frills, no B**S***), a bit opinionated, <a href="http://en.wikipedia.org/wiki/Inversion_of_control">IoC</a> framework written in JavaScript.</p>
 
-<h2>Need for WinterJS</h2>
+<h2>
+<a name="need-for-winterjs" class="anchor" href="#need-for-winterjs"><span class="octicon octicon-link"></span></a>Need for WinterJS</h2>
 
-<p>The objective of WinterJS is to enable authoring of testable JavaScript apps/frameworks. This is achieved by providing a <a href="http://en.wikipedia.org/wiki/Dependency_injection">DI</a> mechanism.</p>
+<p>The core (sole?) objective of WinterJS is to enable authoring of testable JavaScript apps/frameworks. This is achieved by providing a <a href="http://en.wikipedia.org/wiki/Dependency_injection">DI</a> mechanism.</p>
 
-<hr><div class="highlight"><pre>
-<span class="nx">prototypeDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">PROTO</span>
-    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
-        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
-    <span class="p">}</span>
-    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
-        <span class="p">}</span>
-        <span class="p">,{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
-    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
-            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">};</span>
+<p>Hence, unlike some others, it is not coupled with RequireJS. The thought process is that it should be straight forward to author testable and reusable code using plain old objects/prototypes (POJSO?). WinterJS highly encourages this style of coding. This is in contrast to the typical abuse of closures for building "modular" code. </p>
 
-<span class="nx">singletonDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">SINGLETON</span>
-    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
-        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
-        <span class="p">,</span><span class="nx">singleton</span><span class="o">:</span> <span class="kc">true</span> <span class="c1">//(default false; singletons should be discouraged)</span>
-    <span class="p">}</span>
-    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
-        <span class="p">}</span>
-        <span class="p">,{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
-    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
-            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">};</span>
+<p>This, however, is not to discount the merits of building modules. Using WinterJS, it is straightforward to build modules which are thin wrappers over POJSOs. So we get the merits of "modules" without having significant impact on testability or reusability.</p>
 
-<span class="nx">factoryDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">FACTORY</span>
-    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">scope</span><span class="o">:</span> <span class="nx">ABC</span>
-        <span class="p">,</span><span class="nx">namedRef</span><span class="o">:</span> <span class="s2">"f"</span>
-        <span class="p">,</span><span class="nx">factory</span><span class="o">:</span> <span class="p">{</span>
-            <span class="nx">obj</span><span class="o">:</span> <span class="nx">FactoryReference</span>
-            <span class="p">,</span><span class="nx">methodName</span><span class="o">:</span> <span class="s2">"factoryMethodName"</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="p">,</span><span class="nx">constructorArgs</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep1"</span>
-        <span class="p">}</span>
-        <span class="p">,{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"dep2"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">exports</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depx"</span><span class="p">,</span> <span class="s2">"depy"</span><span class="p">]</span>
-    <span class="p">,</span><span class="nx">propertyDependencies</span><span class="o">:</span> <span class="p">[</span>
-        <span class="p">{</span>
-            <span class="nx">ref</span><span class="o">:</span> <span class="s2">"depfoo"</span>
-            <span class="p">,</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"foo"</span>
-        <span class="p">}</span>
-    <span class="p">]</span>
-    <span class="p">,</span><span class="nx">methodDependencies</span><span class="o">:</span> <span class="p">{</span>
-        <span class="nx">getAbc</span><span class="o">:</span> <span class="p">[</span><span class="s2">"depabc"</span><span class="p">]</span>
-    <span class="p">}</span>
-<span class="p">};</span>
-
-<span class="nx">valueDependencyDef</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="nx">DEPENDENCY_TYPE</span><span class="o">:</span> <span class="nx">DIfunction</span><span class="p">.</span><span class="nx">DEPENDENCY_TYPES</span><span class="p">.</span><span class="nx">VALUE</span>
-    <span class="p">,</span><span class="nx">def</span><span class="o">:</span> <span class="s2">"this can be anything like string/number/object/array/function"</span>
-<span class="p">}</span>
-
-</pre></div>
+<hr><p><a href="https://github.com/vaeroon/WinterJS/tree/master/examples">The examples might help to gain a better understanding. Please do take a look.</a></p>
         </section>
 
         <aside id="sidebar">
@@ -142,7 +60,7 @@
 
           <p class="repo-owner"><a href="https://github.com/vaeroon/WinterJS"></a> is maintained by <a href="https://github.com/vaeroon">vaeroon</a>.</p>
 
-          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.</p>
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
         </aside>
       </div>
     </div>
