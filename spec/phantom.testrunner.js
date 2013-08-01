@@ -1,9 +1,7 @@
 var page = require('webpage').create();
-//var url = 'THIS_IS_THE_URL_MARKER';
-var url = 'http://localhost:7890/capture';
+var url = 'spec/SpecRunner.html';
 page.open(url, function (status) {
-    //Page is loaded!
-    console.log("frames=",window.frames.length);
-    console.log("jstestdriver", window.frames[1].jstestdriver);
+    console.log("Page loaded = ",status);
+    phantom.exit();
 });
 
