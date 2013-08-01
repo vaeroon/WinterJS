@@ -29,7 +29,7 @@ Inject.createProxyConstructor = function(ctor, spec) {
     return function() {
         //var targetObj = Inject.createObjectFromRealConstructor(ctor, spec)
         var arr = Array.prototype.slice.call(arguments, 0), numMissingArgs = ctor.length  - arr.length;
-        if(spec.autowire.constructorArgs && spec.autowire.constructorArgs.length>0 && numMissingArgs>0) {
+        if(spec.autowire && spec.autowire.constructorArgs && spec.autowire.constructorArgs.length>0 && numMissingArgs>0) {
             var args = Inject.getConstructorArgDependencies(spec.autowire.constructorArgs.slice(0-numMissingArgs));
             while(numMissingArgs > 0) {
                 arr.push(args[args.length-numMissingArgs]);
@@ -39,8 +39,8 @@ Inject.createProxyConstructor = function(ctor, spec) {
         var targetObj = {}, returnedObj;
         returnedObj = ctor.apply(targetObj, arr);
         if(returnedObj) targetObj = returnedObj;
-        Inject.injectPropertyDependencies(targetObj, spec.autowire.properties);
-        Inject.injectMethodDependencies(targetObj, spec.autowire.methods);
+        if(spec.autowire && spec.autowire.properties) Inject.injectPropertyDependencies(targetObj, spec.autowire.properties);
+        if(spec.autowire && spec.autowire.methods) Inject.injectMethodDependencies(targetObj, spec.autowire.methods);
         return targetObj;
     };
 }
@@ -170,6 +170,7 @@ Inject.getSingletonInstance = function(dependencyDef) {
     for(var i=0, len=provides.length; i<len; i++) {
         Inject.singletons[provides[i]] = dependencyInstance;
     }
+    return dependencyInstance;
 }
 
 Inject.DIconstruct = function(dependencyDef) {
@@ -195,8 +196,8 @@ Inject.getNamespacedFunction = function(dotSeparatedNamespaceString) {
     var func = arr.pop();
     var parent = window;
     for(var i=0, len=arr.length; i<len; i++) {
-        if(!parent[arr[i]]) throw 'invalid invocation';
-        parent = arr[i];
+        if(!parent[arr[i]]) throw 'invalid name';
+        parent = parent[arr[i]];
     }
     return [parent, func];
 }
