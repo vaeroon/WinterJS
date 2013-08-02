@@ -1,5 +1,7 @@
 # WinterJS
-***
+
+[![Build Status](https://travis-ci.org/vaeroon/WinterJS.png)](https://travis-ci.org/vaeroon/WinterJS)
+
 ## What is WinterJS
 WinterJS is a light weight (no frills, no B***S***), a bit opinionated, [IoC](http://en.wikipedia.org/wiki/Inversion_of_control) framework written in JavaScript.
 

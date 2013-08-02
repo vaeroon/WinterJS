@@ -4,13 +4,12 @@
 <head>
     <title>Inversion of Control</title>
     <meta charset="utf-8" >
-    <script type="text/javascript" src="../../src/IoC.js"></script>
+    <script type="text/javascript" src="../../src/winter.js"></script>
     <script type="text/javascript" src="app.js"></script>
     <script type="text/javascript">
         
-        debugger;
-        var obj = new someFunc();       //The proxy intercepts; injects declared dependencies; and returns the decorated object.
-        obj.f1();
+        var obj = new MyNamespace.SomeComponent();       //The proxy intercepts; injects declared dependencies; and returns the decorated object.
+        obj.greet();
         
     </script>
 </head>

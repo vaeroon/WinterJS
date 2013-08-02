@@ -6,12 +6,8 @@
     }
 }.Inject({
     name: "someFunc"
-    ,type: Inject.DEPENDENCY_TYPES.PROTO
     ,autowire: {
-        constructorArgs: [{
-            ref: "hello.message"
-            ,name: "c"
-        }]
+        constructorArgs: ["hello.message"]
     }
 });
 !function(){}.Inject({

@@ -7,11 +7,9 @@
     };
 }.Inject({
     name: "someFunc"
-    ,type: Inject.DEPENDENCY_TYPES.PROTO
     ,autowire: {
         properties: [{
-            ref: "hello.message"
-            ,name: "message"      //Hey! I would like to get some "hello.message" stuff injected as message.
+            message: "hello.message"   //Hey! I would like to get some "hello.message" stuff injected as message.
         }]
     }
 });
