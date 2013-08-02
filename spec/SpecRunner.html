@@ -23,8 +23,6 @@
       var htmlReporter = new jasmine.HtmlReporter();
 
       jasmineEnv.addReporter(htmlReporter);
-      
-      //jasmineEnv.addReporter(new jasmine.JsApiReporter());
 
       jasmineEnv.specFilter = function(spec) {
         return htmlReporter.specFilter(spec);
