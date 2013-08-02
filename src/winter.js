@@ -85,9 +85,6 @@ Inject.injectMethodDependencies = function(targetObj, dependencySpec) {
     }
 }
 
-
-//Inject.getDependencyInstance
-
 Inject.injectPropertyDependencies = function(targetObj, dependencies) {
     if(typeof targetObj !='object' || targetObj===null || typeof dependencies !='object' || dependencies===null) return;
     for(var i=0, len=dependencies.length; i<len; i++) {
