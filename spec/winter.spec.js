@@ -257,12 +257,89 @@ describe("suite of Inject specs:- ", function() {
         expect(Inject.getDependencyInstanceFromFactory.callCount).toBe(1);
     });
     
-    xit("returns an instance for a specified dependency", function() {
-        
+    it("gets an instance from a factory", function() {
+        var obj1 = {
+            nameOfFunction: function() {
+                return "Hello, World!";
+            }
+        };
+        spyOn(obj1, "nameOfFunction").andCallThrough();
+        var someObj={"aaa":"bbb"}, args = [someObj];
+        spyOn(Inject, "getConstructorArgDependencies").andCallFake(function(){
+            return args;
+        });
+        var dependencyDef = {
+            factory: {
+                obj: obj1
+                ,methodName: "nameOfFunction"
+            }
+        };
+        var ret = Inject.getDependencyInstanceFromFactory(dependencyDef);
+        expect(Inject.getConstructorArgDependencies).toHaveBeenCalled();
+        expect(obj1.nameOfFunction.callCount).toBe(1);
+        expect(obj1.nameOfFunction).toHaveBeenCalledWith(someObj);
+        expect(ret).toBe("Hello, World!");
     });
     
-    xit("returns an instance for a specified dependency", function() {
+    it("gets constructor arg dependencies", function() {
+        var dep1="abc", dep2="def", def1={name:"abc"}, def2={name:"def"}, obj1={val:10}, obj2={val:20};
+        spyOn(Inject, "lookupDependencyProvider").andCallFake(function(name){
+            switch(name) {
+                case dep1: return def1;
+                case dep2: return def2;
+            }
+        });
+        spyOn(Inject, "getDependencyInstance").andCallFake(function(def){
+            switch(true) {
+                case (def==def1): return obj1;
+                case (def==def2): return obj2;
+            }
+        });
+        var arr = Inject.getConstructorArgDependencies([dep1,dep2]);
+        expect(arr[0]).toBe(obj1);
+        expect(arr[1]).toBe(obj2);
+    });
+    
+    it("gets a singleton instance", function() {
+        var def = {name: "foo"}, abc={};
+        expect(Inject.getSingletonInstance(def)).toBe(null);
         
+        def.exports=[];
+        expect(Inject.getSingletonInstance(def)).toBe(null);
+        
+        def.exports=["abc", "def"];
+        spyOn(Inject, "DIconstruct").andReturn(abc);
+        
+        expect(Inject.getSingletonInstance(def)).toBe(abc);
+        expect(Inject.DIconstruct).toHaveBeenCalledWith(def);
+        expect(Inject.singletons.abc).toBe(abc);
+        
+        Inject.DIconstruct.reset();
+        Inject.singletons.abc=abc
+        expect(Inject.getSingletonInstance(def)).toBe(abc);
+        expect(Inject.DIconstruct).not.toHaveBeenCalled();
+        
+        Inject.singletons={};
+    });
+    
+    it("invokes proxy constructor and returns the object instantiated", function() {
+        var obj1 = {
+            nameOfFunction: function() {
+                return "Hello, World!";
+            }
+        };
+        var def = {
+            name: "obj1"
+        }
+        spyOn(Inject, "getNamespacedFunction").andReturn([obj1, "nameOfFunction"]);
+        
+        expect(Inject.DIconstruct(def)).toBe("Hello, World!");
+        expect(Inject.getNamespacedFunction.callCount).toBe(1);
+        
+        Inject.getNamespacedFunction.reset();
+        Inject.getNamespacedFunction.andReturn([{}, "undefinedFunc"]);
+        expect(Inject.DIconstruct(def)).toBe(null);
+        expect(Inject.getNamespacedFunction.callCount).toBe(1);
     });
     
     it("creates a namespaced function", function() {
@@ -271,24 +348,15 @@ describe("suite of Inject specs:- ", function() {
         expect(window.A.B.C.foo).toBe(f);
     });
     
-    xit("", function() {
-        
+    it("gets a namespaced function", function() {
+        window.obj1 = {
+            obj2 : {
+                nameOfFunction: function(){}
+            }
+        }
+        var arr = Inject.getNamespacedFunction("obj1.obj2.nameOfFunction");
+        expect(arr[0]).toBe(window.obj1.obj2);
+        expect(arr[1]).toBe("nameOfFunction");
+        window.obj1 = undefined;
     });
-    
-    xit("", function() {
-        
-    });
-    
-    xit("", function() {
-        
-    });
-    
-    xit("", function() {
-        
-    });
-    
-    xit("", function() {
-        
-    });
-    
 });

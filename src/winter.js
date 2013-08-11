@@ -135,8 +135,9 @@ Inject.getDependencyInstanceFromFactory = function(dependencyDef) {
         && typeof dependencyDef.factory.obj == 'object' && dependencyDef.factory.obj != null 
         && typeof dependencyDef.factory.methodName == 'string' && dependencyDef.factory.methodName.length > 0) {
         //return Inject.DIconstruct(dependencyDef);
-        var args=[], ctorArgs = dependencyDef.autowire.constructorArgs;
-        var args = Inject.getConstructorArgDependencies(dependencyDef.autowire.constructorArgs);
+        var args=[], ctorArgs;
+        ctorArgs = (dependencyDef.autowire && dependencyDef.autowire.constructorArgs)? dependencyDef.autowire.constructorArgs : ctorArgs;
+        var args = Inject.getConstructorArgDependencies(ctorArgs);
         /*if(typeof ctorArgs=='object' && ctorArgs.length>0) {
             for(var i=0, len=ctorArgs.length; i<len; i++) {
                 args.push(Inject.getDependencyInstance(ctorArgs[i].ref));
